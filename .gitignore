@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 HELP.md
 target/
 .env
@@ -32,3 +33,69 @@ build/
 
 ### VS Code ###
 .vscode/
+=======
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Testing / Python tools
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ML generated files
+ml-service/models/*
+ml-service/data/processed/*
+
+# Keep required directory placeholders
+!ml-service/models/.gitkeep
+!ml-service/data/processed/.gitkeep
+
+# Logs
+*.log
+logs/
+
+# Java / Spring Boot / Maven
+target/
+*.class
+
+# VS Code
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# IntelliJ
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+>>>>>>> 7971f46a0744c33d0ebbfabe5978b39c3bf8865e
