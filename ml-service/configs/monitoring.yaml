@@ -1,0 +1,25 @@
+# Conservative operational flags; values are configurable starting guardrails,
+# not statistically calibrated business thresholds. Review after sufficient real actuals.
+minimum_sample_size: 100
+minimum_actual_count_for_error_flag: 100
+# Calendar inputs are still summarized but excluded from drift-trigger decisions;
+# their distribution changes by construction across unequal seasonal windows.
+excluded_drift_features:
+  - year
+  - month
+  - day
+  - day_of_week
+  - week_of_year
+  - quarter
+  - is_weekend
+# Mean movement in reference standard deviations; 1.0 flags a >=1 SD shift.
+numeric_mean_shift_sd_threshold: 1.0
+prediction_mean_shift_sd_threshold: 1.0
+# Flag a variance scale change below one-half or above two times the baseline.
+numeric_std_ratio_min: 0.5
+numeric_std_ratio_max: 2.0
+# Total variation distance is bounded [0,1]; 0.2 is a material category-share change.
+categorical_total_variation_threshold: 0.2
+# Retrain flag only after at least 100 actuals and MAE is >20% above baseline.
+mae_degradation_fraction_threshold: 0.2
+retraining_cooldown_days: 90

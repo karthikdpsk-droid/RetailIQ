@@ -1,0 +1,16 @@
+.git
+.env
+.venv
+venv
+__pycache__
+.pytest_cache
+.mypy_cache
+.ruff_cache
+logs
+notebooks
+tests
+data/raw
+data/processed
+data/reference/train_calendar.csv
+models/*.joblib
+!models/demand_forecast_v1.0.2.joblib

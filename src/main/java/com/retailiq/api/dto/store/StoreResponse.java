@@ -12,6 +12,8 @@ public record StoreResponse(
         String address,
         String type,
         boolean active,
+        Integer mlStoreNbr,
+        Integer mlCluster,
         Instant createdAt,
         Instant updatedAt
 ) {}

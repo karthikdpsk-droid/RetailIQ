@@ -1,12 +1,17 @@
-<<<<<<< HEAD
+# Maven
 HELP.md
 target/
+**/target/
+**/build/
+**/dist/
 .env
+.env.*
+!.env.example
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### STS ###
+# Eclipse / STS
 .apt_generated
 .classpath
 .factorypath
@@ -15,13 +20,13 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
+# IntelliJ IDEA
 .idea
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
+# NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -31,20 +36,17 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
+# VS Code
 .vscode/
-=======
-# Environment & Secrets
-.env
-.env.*
-!.env.example
 
 # Python
 __pycache__/
+**/__pycache__/
 *.py[cod]
 *.pyo
 *.pyd
 .venv/
+**/.venv/
 venv/
 env/
 ENV/
@@ -57,45 +59,45 @@ ENV/
 .mypy_cache/
 .ruff_cache/
 
-# ML generated files
-ml-service/models/*
-ml-service/data/processed/*
-
-# Keep required directory placeholders
-!ml-service/models/.gitkeep
-!ml-service/data/processed/.gitkeep
-
 # Logs
 *.log
 logs/
 
-# Java / Spring Boot / Maven
-target/
+# Local databases and credentials
+*.db
+*.sqlite
+*.sqlite3
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+
+# Node.js
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# ML artifacts and datasets not required for inference
+ml-service/models/*.joblib
+!ml-service/models/demand_forecast_v1.0.2.joblib
+ml-service/data/raw/train.csv
+ml-service/data/processed/retailiq_leakage_safe.csv
+ml-service/data/processed/retailiq_leakage_safe_corrected.csv
+ml-service/data/reference/train_calendar.csv
+
+# Java
 *.class
-
-# VS Code
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.json
-
-# IntelliJ
-.idea/
-*.iml
 
 # OS files
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# Node.js
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-pnpm-debug.log*
-
 # Temporary files
 *.tmp
 *.temp
 *.swp
 *.swo
->>>>>>> 7971f46a0744c33d0ebbfabe5978b39c3bf8865e

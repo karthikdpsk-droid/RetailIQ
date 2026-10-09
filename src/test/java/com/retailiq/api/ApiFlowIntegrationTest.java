@@ -4,8 +4,10 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -29,9 +31,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 @SpringBootTest
+@Transactional
 class ApiFlowIntegrationTest {
 
     @Autowired WebApplicationContext context;
@@ -60,6 +64,34 @@ class ApiFlowIntegrationTest {
     }
 
     @Test
+    void corsPreflightAllowsViteOriginAndFrontendHeaders() throws Exception {
+        mvc.perform(options("/api/v1/auth/register")
+                        .header("Origin", "http://localhost:5173")
+                        .header("Access-Control-Request-Method", "POST")
+                        .header("Access-Control-Request-Headers", "content-type,authorization,x-request-id"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:5173"))
+                .andExpect(header().string("Access-Control-Allow-Methods",
+                        org.hamcrest.Matchers.containsString("POST")))
+                .andExpect(header().string("Access-Control-Allow-Headers",
+                        org.hamcrest.Matchers.containsString("authorization")))
+                .andExpect(header().string("Access-Control-Allow-Headers",
+                        org.hamcrest.Matchers.containsString("x-request-id")))
+                .andExpect(header().doesNotExist("WWW-Authenticate"));
+    }
+
+    @Test
+    void registrationIsAccessibleFromViteOrigin() throws Exception {
+        mvc.perform(post("/api/v1/auth/register")
+                        .header("Origin", "http://localhost:5173")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"CORS Owner\",\"email\":\"cors@example.com\",\"password\":\"SecurePass123\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:5173"))
+                .andExpect(jsonPath("$.token").isNotEmpty());
+    }
+
+    @Test
     void authenticatedShopkeeperOwnsStoreProductInventoryAndSales() throws Exception {
         mvc.perform(get("/api/v1/stores")).andExpect(status().isUnauthorized());
         mvc.perform(get("/api/v1/stores").header("Authorization", bearer("not.a.jwt")))
@@ -68,15 +100,18 @@ class ApiFlowIntegrationTest {
         String ownerToken = registerAndGetToken("owner@example.com", "Owner One");
         MvcResult storeResult = mvc.perform(post("/api/v1/stores").header("Authorization", bearer(ownerToken))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"storeCode\":\"ST-1\",\"name\":\"Main Store\",\"city\":\"Pune\",\"state\":\"MH\",\"address\":\"Market Road\",\"type\":\"RETAIL\",\"active\":true}"))
+        .content("{\"storeCode\":\"ST-1\",\"name\":\"Main Store\",\"city\":\"Pune\",\"state\":\"MH\",\"address\":\"Market Road\",\"type\":\"RETAIL\",\"active\":true,\"mlStoreNbr\":3,\"mlCluster\":5}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.ownerId").isNumber())
+                .andExpect(jsonPath("$.mlStoreNbr").value(3))
+                .andExpect(jsonPath("$.mlCluster").value(5))
                 .andReturn();
         long storeId = read(storeResult).path("id").asLong();
         mvc.perform(put("/api/v1/stores/{id}", storeId).header("Authorization", bearer(ownerToken))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"storeCode\":\"ST-1\",\"name\":\"Main Store Updated\",\"city\":\"Pune\",\"state\":\"MH\",\"address\":\"Market Road\",\"type\":\"RETAIL\",\"active\":true}"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.name").value("Main Store Updated"));
+                .andExpect(status().isOk()).andExpect(jsonPath("$.name").value("Main Store Updated"))
+                .andExpect(jsonPath("$.mlStoreNbr").value(3)).andExpect(jsonPath("$.mlCluster").value(5));
         mvc.perform(get("/api/v1/stores").header("Authorization", bearer(ownerToken)))
                 .andExpect(status().isOk()).andExpect(jsonPath("$[0].id").value(storeId));
 

@@ -1,6 +1,7 @@
 package com.retailiq.api.dto.store;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 public record StoreRequest(
@@ -24,5 +25,11 @@ public record StoreRequest(
         @NotBlank(message = "Store type is required")
         String type,
 
-        boolean active
+        boolean active,
+
+        @Positive(message = "ML store number must be positive")
+        Integer mlStoreNbr,
+
+        @Positive(message = "ML cluster must be positive")
+        Integer mlCluster
 ) {}

@@ -16,7 +16,10 @@ import jakarta.persistence.UniqueConstraint;
 import java.time.Instant;
 
 @Entity
-@Table(name = "stores", uniqueConstraints = @UniqueConstraint(name = "uk_stores_store_code", columnNames = "store_code"),
+@Table(name = "stores", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_stores_store_code", columnNames = "store_code"),
+        @UniqueConstraint(name = "uk_stores_ml_store_nbr", columnNames = "ml_store_nbr")
+},
         indexes = @Index(name = "idx_stores_owner", columnList = "owner_id"))
 public class Store {
 
@@ -30,6 +33,12 @@ public class Store {
 
     @Column(name = "store_code", nullable = false, length = 50)
     private String storeCode;
+
+    @Column(name = "ml_store_nbr")
+    private Integer mlStoreNbr;
+
+    @Column(name = "ml_cluster")
+    private Integer mlCluster;
 
     @Column(nullable = false)
     private String name;
@@ -78,6 +87,12 @@ public class Store {
 
     public String getStoreCode() { return storeCode; }
     public void setStoreCode(String storeCode) { this.storeCode = storeCode; }
+
+    public Integer getMlStoreNbr() { return mlStoreNbr; }
+    public void setMlStoreNbr(Integer mlStoreNbr) { this.mlStoreNbr = mlStoreNbr; }
+
+    public Integer getMlCluster() { return mlCluster; }
+    public void setMlCluster(Integer mlCluster) { this.mlCluster = mlCluster; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }

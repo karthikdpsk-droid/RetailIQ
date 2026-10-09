@@ -1,0 +1,10 @@
+# Heuristic daily-review policy. Demand units must match caller inventory units.
+default_lead_time_days: 7
+service_level: 0.95
+review_period_days: 1
+minimum_order_quantity: null
+maximum_stock_level: null
+maximum_supported_lead_time_days: 365
+variability_window_days: 28
+minimum_history_observations: 2
+variability_method: sample_standard_deviation

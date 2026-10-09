@@ -7,6 +7,7 @@ import com.retailiq.api.entity.Store;
 import com.retailiq.api.exception.DuplicateResourceException;
 import com.retailiq.api.exception.ResourceNotFoundException;
 import com.retailiq.api.repository.ProductRepository;
+import com.retailiq.api.repository.MlFamilyRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,11 +18,14 @@ public class ProductService {
     private final ProductRepository products;
     private final StoreService storeService;
     private final CurrentUserService currentUser;
+    private final MlFamilyRepository mlFamilies;
 
-    public ProductService(ProductRepository products, StoreService storeService, CurrentUserService currentUser) {
+    public ProductService(ProductRepository products, StoreService storeService, CurrentUserService currentUser,
+                          MlFamilyRepository mlFamilies) {
         this.products = products;
         this.storeService = storeService;
         this.currentUser = currentUser;
+        this.mlFamilies = mlFamilies;
     }
 
     @Transactional(readOnly = true)
@@ -63,6 +67,10 @@ public class ProductService {
         product.setName(request.name().trim());
         product.setSku(request.sku().trim().toUpperCase(java.util.Locale.ROOT));
         product.setCategory(request.category().trim());
+        if (request.mlFamilyId() != null) {
+            product.setMlFamily(mlFamilies.findById(request.mlFamilyId())
+                    .orElseThrow(() -> new ResourceNotFoundException("ML family not found")));
+        }
         product.setDescription(request.description() == null ? null : request.description().trim());
         product.setUnitPrice(request.unitPrice());
         product.setUnit(request.unit().trim());
@@ -72,6 +80,8 @@ public class ProductService {
     private ProductResponse toResponse(Product product) {
         return new ProductResponse(product.getId(), product.getStore().getId(), product.getName(), product.getSku(),
                 product.getCategory(), product.getDescription(), product.getUnitPrice(), product.getUnit(),
-                product.isActive(), product.getCreatedAt(), product.getUpdatedAt());
+                product.isActive(), product.getCreatedAt(), product.getUpdatedAt(),
+                product.getMlFamily() == null ? null : product.getMlFamily().getId(),
+                product.getMlFamily() == null ? null : product.getMlFamily().getFamilyCode());
     }
 }

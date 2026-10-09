@@ -29,6 +29,11 @@ public class Product {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
+    /** Explicit optional ML-family assignment. Never inferred from category. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ml_family_id")
+    private MlFamily mlFamily;
+
     @Column(nullable = false)
     private String name;
 
@@ -76,6 +81,9 @@ public class Product {
 
     public Store getStore() { return store; }
     public void setStore(Store store) { this.store = store; }
+
+    public MlFamily getMlFamily() { return mlFamily; }
+    public void setMlFamily(MlFamily mlFamily) { this.mlFamily = mlFamily; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }

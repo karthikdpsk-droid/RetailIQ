@@ -14,5 +14,7 @@ public record ProductResponse(
         String unit,
         boolean active,
         Instant createdAt,
-        Instant updatedAt
+        Instant updatedAt,
+        Long mlFamilyId,
+        String mlFamilyCode
 ) {}

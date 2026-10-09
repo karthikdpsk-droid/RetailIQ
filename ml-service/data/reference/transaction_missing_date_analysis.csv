@@ -1,0 +1,3 @@
+date,train_stores,transaction_stores,missing_stores
+2016-01-01,54,0,54
+2016-01-03,54,0,54

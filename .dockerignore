@@ -4,3 +4,13 @@ target
 .vscode
 *.iml
 .env
+**/.env
+**/.venv
+**/node_modules
+**/__pycache__
+**/target
+**/dist
+**/build
+**/logs
+frontend
+ml-service

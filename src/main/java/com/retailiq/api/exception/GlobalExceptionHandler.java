@@ -60,6 +60,25 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.BAD_REQUEST, "Bad request", ex.getMessage(), request);
     }
 
+    @ExceptionHandler(com.retailiq.api.service.ForecastMappingException.class)
+    public ResponseEntity<ApiErrorResponse> handleForecastMapping(
+            com.retailiq.api.service.ForecastMappingException ex, HttpServletRequest request) {
+        return buildError(HttpStatus.CONFLICT, "Forecast mapping unavailable", ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(com.retailiq.api.service.ForecastFeatureUnavailableException.class)
+    public ResponseEntity<ApiErrorResponse> handleForecastFeatureUnavailable(
+            com.retailiq.api.service.ForecastFeatureUnavailableException ex, HttpServletRequest request) {
+        return buildError(HttpStatus.SERVICE_UNAVAILABLE, "Forecast data unavailable", ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(com.retailiq.api.ml.MlIntegrationException.class)
+    public ResponseEntity<ApiErrorResponse> handleMlIntegration(
+            com.retailiq.api.ml.MlIntegrationException ex, HttpServletRequest request) {
+        HttpStatus status = ex.getStatus() == 503 ? HttpStatus.SERVICE_UNAVAILABLE : HttpStatus.BAD_GATEWAY;
+        return buildError(status, "ML service request failed", ex.getMessage(), request);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
         Map<String, String> errors = new HashMap<>();

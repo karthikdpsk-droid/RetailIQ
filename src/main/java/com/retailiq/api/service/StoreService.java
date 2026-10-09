@@ -62,6 +62,9 @@ public class StoreService {
     }
 
     private void apply(Store store, StoreRequest request) {
+        if ((request.mlStoreNbr() == null) != (request.mlCluster() == null)) {
+            throw new IllegalArgumentException("ML store number and ML cluster must be provided together");
+        }
         store.setStoreCode(request.storeCode().trim().toUpperCase(java.util.Locale.ROOT));
         store.setName(request.name().trim());
         store.setCity(request.city().trim());
@@ -69,11 +72,15 @@ public class StoreService {
         store.setAddress(request.address().trim());
         store.setType(request.type().trim());
         store.setActive(request.active());
+        if (request.mlStoreNbr() != null) {
+            store.setMlStoreNbr(request.mlStoreNbr());
+            store.setMlCluster(request.mlCluster());
+        }
     }
 
     private StoreResponse toResponse(Store store) {
         return new StoreResponse(store.getId(), store.getOwner().getId(), store.getStoreCode(), store.getName(),
                 store.getCity(), store.getState(), store.getAddress(), store.getType(), store.isActive(),
-                store.getCreatedAt(), store.getUpdatedAt());
+                store.getMlStoreNbr(), store.getMlCluster(), store.getCreatedAt(), store.getUpdatedAt());
     }
 }

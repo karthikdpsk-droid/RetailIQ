@@ -8,6 +8,7 @@ import com.retailiq.api.entity.Store;
 import com.retailiq.api.exception.ApiException;
 import com.retailiq.api.exception.ResourceNotFoundException;
 import com.retailiq.api.repository.ForecastRepository;
+import com.retailiq.api.repository.StoreFamilyForecastRepository;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -20,13 +21,16 @@ public class ForecastService {
     private final StoreService storeService;
     private final ProductService productService;
     private final CurrentUserService currentUser;
+    private final StoreFamilyForecastRepository storeFamilyForecasts;
 
     public ForecastService(ForecastRepository forecasts, StoreService storeService,
-                           ProductService productService, CurrentUserService currentUser) {
+                           ProductService productService, CurrentUserService currentUser,
+                           StoreFamilyForecastRepository storeFamilyForecasts) {
         this.forecasts = forecasts;
         this.storeService = storeService;
         this.productService = productService;
         this.currentUser = currentUser;
+        this.storeFamilyForecasts = storeFamilyForecasts;
     }
     @Transactional(readOnly = true)
     public List<ForecastResponse> list() {
@@ -46,6 +50,16 @@ public class ForecastService {
         productService.accessibleProduct(id);
         return (currentUser.isAdmin() ? forecasts.findByProductId(id) : forecasts.findAllByProductIdAndStoreOwnerEmail(id, currentUser.email()))
                 .stream().map(this::toResponse).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<com.retailiq.api.dto.forecast.StoreFamilyForecastResponse> byStoreFamily(Long storeId) {
+        storeService.accessibleStore(storeId);
+        return storeFamilyForecasts.findByStoreIdOrderByForecastDateDesc(storeId).stream()
+                .map(item -> new com.retailiq.api.dto.forecast.StoreFamilyForecastResponse(item.getId(),
+                        item.getStore().getId(), item.getMlFamily().getFamilyCode(), item.getForecastDate(),
+                        item.getPredictionCutoff(), item.getForecastDemand(), item.getDemandUnit(),
+                        item.getModelVersion(), item.getCreatedAt())).toList();
     }
     @PreAuthorize("hasAnyRole('ADMIN', 'SHOPKEEPER')")
     public ForecastResponse ingest(ForecastRequest request) {
