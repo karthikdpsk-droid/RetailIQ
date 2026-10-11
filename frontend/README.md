@@ -53,6 +53,7 @@ For local development, start PostgreSQL and the API, then run the ML container o
 ## Troubleshooting
 
 - Connection errors: confirm the API is running and `VITE_API_BASE_URL` is set, with CORS configured.
+- Render Free services can sleep while idle. The frontend retries transient API `GET` failures for up to about 3 minutes 35 seconds while the API wakes; write requests are not retried.
 - 401 response: sign in again; the application clears expired sessions.
 - Deep links return 404 after deployment: configure the static host SPA fallback to `/index.html`.
 - Empty dashboard: the UI shows live API totals only; create records through the API-backed pages.
