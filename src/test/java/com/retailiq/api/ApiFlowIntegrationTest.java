@@ -64,6 +64,23 @@ class ApiFlowIntegrationTest {
     }
 
     @Test
+    void dashboardSummaryReturnsHonestZerosForAnEmptyOwner() throws Exception {
+        String token = registerAndGetToken("empty-dashboard@example.com", "Empty Dashboard Owner");
+
+        mvc.perform(get("/api/v1/dashboard/summary").header("Authorization", bearer(token)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.stores").value(0))
+                .andExpect(jsonPath("$.products").value(0))
+                .andExpect(jsonPath("$.trackedInventoryItems").value(0))
+                .andExpect(jsonPath("$.lowStockItems").value(0))
+                .andExpect(jsonPath("$.manualSaleRecords").value(0))
+                .andExpect(jsonPath("$.importedFamilySalesRecords").value(0))
+                .andExpect(jsonPath("$.importedTransactionRows").value(0))
+                .andExpect(jsonPath("$.forecastRecords").value(0))
+                .andExpect(jsonPath("$.recommendationRecords").value(0));
+    }
+
+    @Test
     void corsPreflightAllowsViteOriginAndFrontendHeaders() throws Exception {
         mvc.perform(options("/api/v1/auth/register")
                         .header("Origin", "http://localhost:5173")

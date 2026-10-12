@@ -30,16 +30,16 @@ class ForecastOrchestrationServiceTest {
         MlForecastClient client = mock(MlForecastClient.class);
         StoreFamilyForecastRepository forecasts = mock(StoreFamilyForecastRepository.class);
         Store store = new Store(); store.setId(4L);
-        MlFamily family = new MlFamily("FAMILY A"); family.setId(7L);
+        MlFamily family = new MlFamily("GROCERY I"); family.setId(7L);
         LocalDate date = LocalDate.of(2026, 10, 9);
-        StoreFamilyForecastCreateRequest command = new StoreFamilyForecastCreateRequest(4L, "FAMILY A", date);
-        MlForecastRequest mlRequest = new MlForecastRequest(date, date.minusDays(1), 8, "FAMILY A", 2.0,
+        StoreFamilyForecastCreateRequest command = new StoreFamilyForecastCreateRequest(4L, "GROCERY I", date);
+        MlForecastRequest mlRequest = new MlForecastRequest(date, date.minusDays(1), 8, "GROCERY I", 2.0,
                 "City", "State", "A", 6, 70.0, 0, 2026, 10, 9, 4, 41, 4, 0, 1,
                 1.0, 2.0, 3.0, 4.0, 2.0, 2.5, 3.0, 0.5);
         when(storeService.accessibleStore(4L)).thenReturn(store);
-        when(families.findByFamilyCode("FAMILY A")).thenReturn(Optional.of(family));
+        when(families.findByFamilyCode("GROCERY I")).thenReturn(Optional.of(family));
         when(features.build(store, family, date)).thenReturn(mlRequest);
-        when(client.forecast(mlRequest, "req-1")).thenReturn(new MlForecastResponse(8, "FAMILY A", date,
+        when(client.forecast(mlRequest, "req-1")).thenReturn(new MlForecastResponse(8, "GROCERY I", date,
                 new BigDecimal("23.456789"), 1, "point_forecast", "demand_forecast_v1.0.2"));
         when(forecasts.saveAndFlush(any(StoreFamilyForecast.class))).thenAnswer(invocation -> {
             StoreFamilyForecast saved = invocation.getArgument(0); saved.setId(10L); return saved;
@@ -50,7 +50,7 @@ class ForecastOrchestrationServiceTest {
         var response = orchestration.forecast(command, "req-1");
 
         assertThat(response.id()).isEqualTo(10L); assertThat(response.storeId()).isEqualTo(4L);
-        assertThat(response.mlFamily()).isEqualTo("FAMILY A"); assertThat(response.forecastDate()).isEqualTo(date);
+        assertThat(response.mlFamily()).isEqualTo("GROCERY I"); assertThat(response.forecastDate()).isEqualTo(date);
         assertThat(response.predictionCutoff()).isEqualTo(date.minusDays(1));
         assertThat(response.forecastDemand()).isEqualByComparingTo("23.4568");
         assertThat(response.demandUnit()).isEqualTo(DemandUnit.MONETARY_SALES);

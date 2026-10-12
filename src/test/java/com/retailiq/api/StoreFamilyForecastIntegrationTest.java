@@ -133,21 +133,21 @@ class StoreFamilyForecastIntegrationTest {
         store.setCity("Quito"); store.setState("Pichincha"); store.setAddress("Test address");
         store.setType("A"); store.setMlStoreNbr(3); store.setMlCluster(5);
         store = stores.saveAndFlush(store);
-        MlFamily family = families.saveAndFlush(new MlFamily("FAMILY A"));
+        MlFamily family = families.saveAndFlush(new MlFamily("GROCERY I"));
         String token = jwtService.generateToken(owner);
         long storeId = store.getId();
         LocalDate date = LocalDate.of(2017, 12, 25);
-        promotionPlans.createOrUpdate(3, "FAMILY A", date, 2,
+        promotionPlans.createOrUpdate(3, "GROCERY I", date, 2,
                 date.minusDays(1).atStartOfDay(java.time.ZoneOffset.UTC).toInstant());
 
         mvc.perform(post("/api/v1/forecasts/store-family")
                         .header("Authorization", "Bearer " + token)
                         .header("X-Request-ID", "forecast-flow-123")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"storeId\":" + storeId + ",\"mlFamily\":\"FAMILY A\",\"forecastDate\":\"" + date + "\"}"))
+                        .content("{\"storeId\":" + storeId + ",\"mlFamily\":\"GROCERY I\",\"forecastDate\":\"" + date + "\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.storeId").value(storeId))
-                .andExpect(jsonPath("$.mlFamily").value("FAMILY A"))
+                .andExpect(jsonPath("$.mlFamily").value("GROCERY I"))
                 .andExpect(jsonPath("$.forecastDate").value(date.toString()))
                 .andExpect(jsonPath("$.predictionCutoff").value("2017-12-24"))
                 .andExpect(jsonPath("$.forecastDemand").value(125.75))

@@ -18,4 +18,6 @@ public interface ForecastRepository extends JpaRepository<Forecast, Long> {
     List<Forecast> findAllByStoreIdAndStoreOwnerEmail(Long storeId, String email);
 
     List<Forecast> findAllByProductIdAndStoreOwnerEmail(Long productId, String email);
+
+    long countByStoreOwnerEmail(String email);
 }

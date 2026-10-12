@@ -16,6 +16,8 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
 
     java.util.Optional<Store> findByIdAndOwnerEmail(Long id, String email);
 
+    long countByOwnerEmail(String email);
+
     boolean existsByStoreCodeIgnoreCase(String storeCode);
 
     java.util.Optional<Store> findByMlStoreNbr(Integer mlStoreNbr);

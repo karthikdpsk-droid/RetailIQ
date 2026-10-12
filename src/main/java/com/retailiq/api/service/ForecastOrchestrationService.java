@@ -10,6 +10,7 @@ import com.retailiq.api.exception.ResourceNotFoundException;
 import com.retailiq.api.ml.MlForecastClient;
 import com.retailiq.api.ml.MlForecastRequest;
 import com.retailiq.api.ml.MlForecastResponse;
+import com.retailiq.api.ml.SupportedMlFamilies;
 import com.retailiq.api.repository.MlFamilyRepository;
 import com.retailiq.api.repository.StoreFamilyForecastRepository;
 import java.time.LocalDate;
@@ -49,6 +50,9 @@ public class ForecastOrchestrationService {
         try {
             log.info("forecast_started request_id={} store_id={} family={} forecast_date={}",
                     safeRequestId, command.storeId(), familyCode, date);
+            if (!SupportedMlFamilies.contains(familyCode)) {
+                throw new IllegalArgumentException("ML family is not supported by the active forecasting model");
+            }
             Store store = stores.accessibleStore(command.storeId());
             MlFamily family = families.findByFamilyCode(familyCode)
                     .orElseThrow(() -> new ResourceNotFoundException("ML family not found"));

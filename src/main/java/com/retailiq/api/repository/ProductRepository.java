@@ -18,4 +18,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findAllByStoreOwnerEmail(String email);
 
     Optional<Product> findByIdAndStoreOwnerEmail(Long id, String email);
+
+    long countByStoreOwnerEmail(String email);
 }

@@ -2,6 +2,7 @@ package com.retailiq.api.controller;
 
 import com.retailiq.api.entity.MlFamily;
 import com.retailiq.api.exception.DuplicateResourceException;
+import com.retailiq.api.ml.SupportedMlFamilies;
 import com.retailiq.api.repository.MlFamilyRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,7 +29,9 @@ public class MlFamilyController {
 
     @GetMapping
     public List<MlFamily> list() {
-        return repository.findAll();
+        return repository.findAll().stream()
+                .filter(family -> SupportedMlFamilies.contains(family.getFamilyCode()))
+                .toList();
     }
 
     public record CreateMlFamilyRequest(String familyCode) {}
@@ -39,6 +42,9 @@ public class MlFamilyController {
             return ResponseEntity.badRequest().build();
         }
         String code = request.familyCode().trim().toUpperCase(java.util.Locale.ROOT);
+        if (!SupportedMlFamilies.contains(code)) {
+            return ResponseEntity.badRequest().build();
+        }
         if (repository.findByFamilyCode(code).isPresent()) {
             throw new DuplicateResourceException("ML family code already exists");
         }

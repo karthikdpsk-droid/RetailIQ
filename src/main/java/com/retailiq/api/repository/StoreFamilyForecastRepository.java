@@ -11,4 +11,5 @@ public interface StoreFamilyForecastRepository extends JpaRepository<StoreFamily
     List<StoreFamilyForecast> findByStoreIdAndForecastDate(Long storeId, LocalDate forecastDate);
     boolean existsByStoreIdAndMlFamilyIdAndForecastDateAndModelVersion(
             Long storeId, Long mlFamilyId, LocalDate forecastDate, String modelVersion);
+    long countByStoreOwnerEmail(String email);
 }

@@ -4,6 +4,7 @@ import com.retailiq.api.entity.MlFamily;
 import com.retailiq.api.entity.Store;
 import com.retailiq.api.ml.MlForecastRequest;
 import com.retailiq.api.repository.DailySalesTotal;
+import com.retailiq.api.repository.FamilySalesObservationRepository;
 import com.retailiq.api.repository.SaleRepository;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -17,13 +18,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class ForecastFeatureService {
     private final SaleRepository sales;
+    private final FamilySalesObservationRepository familySales;
     private final PromotionProvider promotions;
     private final HolidayEventProvider holidays;
     private final OilPriceProvider oilPrices;
 
-    public ForecastFeatureService(SaleRepository sales, PromotionProvider promotions,
+    public ForecastFeatureService(SaleRepository sales, FamilySalesObservationRepository familySales,
+            PromotionProvider promotions,
             HolidayEventProvider holidays, OilPriceProvider oilPrices) {
-        this.sales = sales; this.promotions = promotions; this.holidays = holidays; this.oilPrices = oilPrices;
+        this.sales = sales; this.familySales = familySales; this.promotions = promotions;
+        this.holidays = holidays; this.oilPrices = oilPrices;
     }
 
     public MlForecastRequest build(Store store, MlFamily family, LocalDate forecastDate) {
@@ -70,6 +74,14 @@ public class ForecastFeatureService {
             if (!Double.isFinite(amount) || amount < 0)
                 throw new ForecastFeatureUnavailableException("Monetary sales history contains an invalid value");
             history.put(row.saleDate(), amount);
+        }
+        for (var observation : familySales.findByStore_IdAndMlFamily_IdAndObservationDateBetween(
+                store.getId(), family.getId(), historyStart, predictionCutoff)) {
+            if (observation.getSales() == null) continue;
+            double amount = observation.getSales().doubleValue();
+            if (!Double.isFinite(amount) || amount < 0)
+                throw new ForecastFeatureUnavailableException("Imported monetary sales history contains an invalid value");
+            history.put(observation.getObservationDate(), amount);
         }
         LocalDate d = forecastDate;
         int dayOfWeek = d.getDayOfWeek().getValue() - 1; // Python weekday(): Monday=0

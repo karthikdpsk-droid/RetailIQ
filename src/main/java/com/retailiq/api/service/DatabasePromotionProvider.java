@@ -3,6 +3,7 @@ package com.retailiq.api.service;
 import com.retailiq.api.entity.MlFamily;
 import com.retailiq.api.entity.Store;
 import com.retailiq.api.repository.PromotionPlanRepository;
+import com.retailiq.api.repository.FamilySalesObservationRepository;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.OptionalDouble;
@@ -11,16 +12,25 @@ import org.springframework.stereotype.Component;
 @Component
 public class DatabasePromotionProvider implements PromotionProvider {
     private final PromotionPlanRepository plans;
+    private final FamilySalesObservationRepository familySales;
 
-    public DatabasePromotionProvider(PromotionPlanRepository plans) { this.plans = plans; }
+    public DatabasePromotionProvider(PromotionPlanRepository plans, FamilySalesObservationRepository familySales) {
+        this.plans = plans;
+        this.familySales = familySales;
+    }
 
     @Override
     public OptionalDouble onPromotion(Store store, MlFamily family, LocalDate forecastDate, Instant predictionCutoff) {
         if (store == null || store.getMlStoreNbr() == null || store.getMlStoreNbr() < 1
                 || family == null || family.getFamilyCode() == null || family.getFamilyCode().isBlank()
                 || forecastDate == null || predictionCutoff == null) return OptionalDouble.empty();
-        return plans.findAvailable(store.getMlStoreNbr(), family.getFamilyCode().trim(), forecastDate, predictionCutoff)
+        OptionalDouble planned = plans.findAvailable(store.getMlStoreNbr(), family.getFamilyCode().trim(), forecastDate, predictionCutoff)
                 .filter(p -> p.getOnPromotion() != null && p.getOnPromotion() >= 0)
+                .map(p -> OptionalDouble.of(p.getOnPromotion().doubleValue()))
+                .orElseGet(OptionalDouble::empty);
+        if (planned.isPresent()) return planned;
+        return familySales.findPromotion(store.getMlStoreNbr(), family.getFamilyCode().trim(), forecastDate)
+                .filter(p -> p.getOnPromotion().signum() >= 0)
                 .map(p -> OptionalDouble.of(p.getOnPromotion().doubleValue()))
                 .orElseGet(OptionalDouble::empty);
     }

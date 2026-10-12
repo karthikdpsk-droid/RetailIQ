@@ -11,6 +11,7 @@ import com.retailiq.api.entity.MlFamily;
 import com.retailiq.api.entity.Store;
 import com.retailiq.api.ml.MlForecastRequest;
 import com.retailiq.api.repository.DailySalesTotal;
+import com.retailiq.api.repository.FamilySalesObservationRepository;
 import com.retailiq.api.repository.SaleRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -22,10 +23,12 @@ import org.junit.jupiter.api.Test;
 class ForecastFeatureServiceTest {
     private static final LocalDate DATE = LocalDate.of(2025, 1, 6); // Monday, ISO week 2
     private final SaleRepository sales = mock(SaleRepository.class);
+    private final FamilySalesObservationRepository familySales = mock(FamilySalesObservationRepository.class);
     private final Promotions promotions = new Promotions();
     private final Holidays holidays = new Holidays();
     private final Oil oil = new Oil();
-    private final ForecastFeatureService service = new ForecastFeatureService(sales, promotions, holidays, oil);
+    private final ForecastFeatureService service =
+            new ForecastFeatureService(sales, familySales, promotions, holidays, oil);
 
     @Test void derivesCalendarMappingAndContextFeatures() {
         when(sales.aggregateMonetarySalesByStoreFamilyAndDate(eq(44L), eq(3), eq(8L), any(), any())).thenReturn(List.of());

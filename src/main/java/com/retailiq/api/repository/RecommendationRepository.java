@@ -19,4 +19,10 @@ public interface RecommendationRepository extends JpaRepository<Recommendation, 
     List<Recommendation> findAllByStoreIdAndStoreOwnerEmail(Long storeId, String email);
 
     List<Recommendation> findAllByProductIdAndStoreOwnerEmail(Long productId, String email);
+
+    long countByStoreOwnerEmail(String email);
+
+    long countByStoreOwnerEmailAndRecommendationType(String email, com.retailiq.api.entity.Recommendation.Type type);
+
+    long countByRecommendationType(com.retailiq.api.entity.Recommendation.Type type);
 }
