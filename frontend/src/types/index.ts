@@ -7,3 +7,12 @@ export interface Sale { id:number; storeId:number; productId:number; quantity:nu
 export interface Forecast { id:number; storeId:number; productId:number; forecastDate:string; predictedDemand:number; lowerBound:number|null; upperBound:number|null; modelVersion:string; createdAt:string }
 export interface StoreFamilyForecast { id:number; storeId:number; mlFamily:string; forecastDate:string; predictionCutoff:string; forecastDemand:number; demandUnit:'MONETARY_SALES'; modelVersion:string; createdAt:string }
 export interface Recommendation { id:number; storeId:number; productId:number; recommendationType:'REORDER'|'LOW_STOCK'|'OVERSTOCK'|'NORMAL'; recommendedQuantity:number; reason:string|null; recommendationDate:string; createdAt?:string }
+export interface DashboardTrendPoint { date:string; amount:number }
+export interface DashboardSummary {
+  stores:number; products:number; trackedInventoryItems:number; lowStockItems:number;
+  manualSaleRecords:number; manualSalesAmount:number;
+  importedFamilySalesRecords:number; importedFamilySalesAmount:number;
+  importedTransactionRows:number; importedTransactions:number;
+  forecastRecords:number; recommendationRecords:number; reorderRecommendations:number;
+  manualSalesTrend:DashboardTrendPoint[]; importedFamilySalesTrend:DashboardTrendPoint[];
+}
